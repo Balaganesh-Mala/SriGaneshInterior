@@ -9,12 +9,14 @@ import EstimateCards from "../components/estimate/EstimateCards";
 import ContactForm from "../components/contact/ContactForm";
 import FAQSection from "../components/faq/FAQSection";
 import Footer from "../components/layout/Footer";
+import ServicesGrid from "../components/services/ServicesGrid";
 
 const Landing = () => {
   return (
     <>
       <Navbar />
       <Hero />
+      <ServicesGrid/>
       <FeaturesGrid/>
       <ServicesList/>
       <ServicesIcons/>
