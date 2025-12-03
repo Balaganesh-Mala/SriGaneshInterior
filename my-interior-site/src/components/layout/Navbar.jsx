@@ -1,10 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Bars3Icon,
-  XMarkIcon,
-  ChevronDownIcon,
-} from "@heroicons/react/24/outline";
+import { Bars3Icon, XMarkIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import { FaChevronRight } from "react-icons/fa6";
 import Logo from "../../assets/images/logo.png";
 import EstimateFormModal from "../contact/EstimateFormModal";
@@ -26,90 +22,94 @@ const navLinks = [
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [hoveredMenu, setHoveredMenu] = useState(null);
-  const [modalOpen, setModalOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(null);
+
+  const toggleDropdown = (menuName) => {
+    setDropdownOpen(dropdownOpen === menuName ? null : menuName);
+  };
 
   return (
     <>
       {/* NAVBAR */}
-      <header className="w-full fixed top-0 left-0 z-50 bg-white shadow-sm md:bg-white/80 md:backdrop-blur-lg">
-
+      <header className="w-full fixed top-0 left-0 z-50 bg-white shadow-sm backdrop-blur-md bg-white/80">
         <nav className="max-w-screen-xl mx-auto px-5 py-4 flex justify-between items-center">
+
           {/* LOGO */}
-          <a href="/" className="flex items-center">
+          <Link to="/" className="flex items-center">
             <img
               src={Logo}
-              alt="Sri Ganesh"
+              alt="Devi Varahi Global Exims"
               className="h-8 sm:h-10 w-auto object-contain"
             />
-          </a>
+          </Link>
 
           {/* DESKTOP MENU */}
-          <ul className="hidden md:flex items-center gap-8 text-gray-800 font-medium">
-            {navLinks.map((item, index) => (
-              <li
-                key={index}
-                className="relative group"
-                onMouseEnter={() => setHoveredMenu(index)}
-                onMouseLeave={() => setHoveredMenu(null)}
-              >
-                {!item.dropdown ? (
-                  <a
-                    href={item.href}
-                    className="hover:text-red-600 transition"
-                  >
-                    {item.name}
-                  </a>
+          <ul className="hidden md:flex items-center gap-8 text-gray-800 font-medium text-lg">
+            {navLinks.map((item) => (
+              <li key={item.name} className="relative">
+
+                {item.dropdown ? (
+                  <>
+                    <button
+                      onClick={() => toggleDropdown(item.name)}
+                      className="flex items-center gap-1 hover:text-orange-600 transition"
+                    >
+                      {item.name}
+                      <ChevronDownIcon className="w-4 h-4" />
+                    </button>
+
+                    {/* DROPDOWN (ON CLICK) */}
+                    <AnimatePresence>
+                      {dropdownOpen === item.name && (
+                        <motion.ul
+                          initial={{ opacity: 0, y: -5 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -5 }}
+                          transition={{ duration: 0.2 }}
+                          className="absolute left-0 top-8 w-52 bg-white shadow-lg rounded-lg py-2"
+                        >
+                          {item.dropdown.map((subItem) => (
+                            <li key={subItem.name}>
+                              <Link
+                                to={subItem.href}
+                                className="flex items-center justify-between px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                onClick={() => setDropdownOpen(null)}
+                              >
+                                {subItem.name}
+                                <FaChevronRight className="text-xs text-gray-500" />
+                              </Link>
+                            </li>
+                          ))}
+                        </motion.ul>
+                      )}
+                    </AnimatePresence>
+                  </>
                 ) : (
-                  <button className="flex items-center gap-1 hover:text-red-600 transition">
+                  <Link to={item.href} className="hover:text-orange-600 transition">
                     {item.name}
-                    <ChevronDownIcon className="w-4 h-4" />
-                  </button>
+                  </Link>
                 )}
 
-                {/* HOVER DROPDOWN */}
-                {item.dropdown && hoveredMenu === index && (
-                  <motion.ul
-                    initial={{ opacity: 0, y: -4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -4 }}
-                    className="absolute left-0 top-7 w-52 bg-white shadow-lg rounded-lg py-3 z-40"
-                  >
-                    {item.dropdown.map((subItem, subIdx) => (
-                      <li key={subIdx}>
-                        <a
-                          href={subItem.href}
-                          className="flex items-center justify-between px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        >
-                          {subItem.name}
-                          <FaChevronRight className="text-xs text-gray-500" />
-                        </a>
-                      </li>
-                    ))}
-                  </motion.ul>
-                )}
               </li>
             ))}
           </ul>
 
-          {/* DESKTOP CTA BUTTON */}
+          {/* DESKTOP CTA */}
           <motion.button
-            onClick={() => setModalOpen(true)}
+            onClick={() => setDropdownOpen(null)}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="hidden md:inline-flex px-5 py-2 bg-red-600 text-white rounded-lg shadow hover:bg-red-700 transition"
+            className="hidden md:inline-flex px-5 py-2 bg-orange-600 text-white rounded-lg shadow-md hover:bg-orange-700 transition"
           >
             Get Free Estimate
           </motion.button>
 
-          {/* MOBILE ICONS (HAMBURGER) */}
-          <button
-            onClick={() => setMobileOpen(true)}
-            className="md:hidden block"
-          >
+          {/* MOBILE MENU BUTTON */}
+          <button onClick={() => setMobileOpen(true)} className="md:hidden block">
             <Bars3Icon className="w-7 h-7 text-gray-900" />
           </button>
         </nav>
+      </header>
 
       {/* MOBILE DRAWER */}
       <AnimatePresence>
@@ -125,7 +125,7 @@ export default function Navbar() {
             <div className="flex justify-between items-center px-5 py-4 border-b">
               <img
                 src={Logo}
-                alt="Sri Ganesh"
+                alt="Devi Varahi Global Exims"
                 className="h-8 w-auto object-contain"
               />
               <button onClick={() => setMobileOpen(false)}>
@@ -135,42 +135,48 @@ export default function Navbar() {
 
             {/* Drawer Links */}
             <ul className="flex flex-col gap-6 text-lg font-medium p-6">
-              {navLinks.map((item, index) => (
-                <li key={index}>
-                  {!item.dropdown ? (
-                    <a
-                      href={item.href}
-                      className="block"
+              {navLinks.map((item) => (
+                <li key={item.name}>
+                  {item.dropdown ? (
+                    <>
+                      <button
+                        onClick={() => toggleDropdown(item.name)}
+                        className="w-full flex justify-between items-center text-gray-900"
+                      >
+                        {item.name}
+                        <ChevronDownIcon className="w-5 h-5" />
+                      </button>
+
+                      {dropdownOpen === item.name && (
+                        <ul className="ml-4 mt-2 flex flex-col gap-2">
+                          {item.dropdown.map((subItem) => (
+                            <li key={subItem.name}>
+                              <Link
+                                to={subItem.href}
+                                className="text-gray-600 text-base"
+                                onClick={() => setMobileOpen(false)}
+                              >
+                                {subItem.name}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </>
+                  ) : (
+                    <Link
+                      to={item.href}
+                      className="text-gray-900 block"
                       onClick={() => setMobileOpen(false)}
                     >
                       {item.name}
-                    </a>
-                  ) : (
-                    <details className="group">
-                      <summary className="cursor-pointer flex justify-between items-center">
-                        {item.name}
-                        <ChevronDownIcon className="w-5 h-5 inline-block" />
-                      </summary>
-                      <ul className="ml-4 mt-2 flex flex-col gap-2">
-                        {item.dropdown.map((subItem, subIdx) => (
-                          <li key={subIdx}>
-                            <a
-                              href={subItem.href}
-                              className="text-gray-600 text-base"
-                              onClick={() => setMobileOpen(false)}
-                            >
-                              {subItem.name}
-                            </a>
-                          </li>
-                        ))}
-                      </ul>
-                    </details>
+                    </Link>
                   )}
                 </li>
               ))}
             </ul>
 
-            {/* Drawer CTA */}
+            {/* CTA Button */}
             <motion.button
               onClick={() => {
                 setMobileOpen(false);
@@ -178,20 +184,16 @@ export default function Navbar() {
               }}
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.96 }}
-              className="block mx-6 mt-2 mb-6 px-5 py-2 bg-red-600 text-white rounded-lg shadow"
+              className="block mx-6 mt-2 mb-6 px-5 py-2 bg-orange-600 text-white rounded-lg shadow-md hover:bg-orange-700 transition w-full"
             >
               Get Free Estimate
             </motion.button>
           </motion.div>
         )}
       </AnimatePresence>
-      </header>
 
-      {/* ESTIMATE FORM MODAL */}
-      <EstimateFormModal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-      />
+      {/* ESTIMATE FORM MODAL (Web3Forms) */}
+      <EstimateFormModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </>
   );
 }
