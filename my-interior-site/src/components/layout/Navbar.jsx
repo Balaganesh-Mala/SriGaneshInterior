@@ -1,6 +1,11 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bars3Icon, XMarkIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
+import {
+  Bars3Icon,
+  XMarkIcon,
+  ChevronDownIcon,
+} from "@heroicons/react/24/outline";
 import { FaChevronRight } from "react-icons/fa6";
 import Logo from "../../assets/images/logo.png";
 import EstimateFormModal from "../contact/EstimateFormModal";
@@ -22,61 +27,56 @@ const navLinks = [
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(null);
-
-  const toggleDropdown = (menuName) => {
-    setDropdownOpen(dropdownOpen === menuName ? null : menuName);
-  };
+  const [desktopDropdown, setDesktopDropdown] = useState(null);
+  const [mobileDropdown, setMobileDropdown] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   return (
     <>
       {/* NAVBAR */}
-      <header className="w-full fixed top-0 left-0 z-50 bg-white shadow-sm backdrop-blur-md bg-white/80">
+      <header className="fixed top-0 left-0 w-full z-50 bg-white/80 backdrop-blur shadow-sm">
         <nav className="max-w-screen-xl mx-auto px-5 py-4 flex justify-between items-center">
 
           {/* LOGO */}
-          <Link to="/" className="flex items-center">
-            <img
-              src={Logo}
-              alt="Devi Varahi Global Exims"
-              className="h-8 sm:h-10 w-auto object-contain"
-            />
+          <Link to="/">
+            <img src={Logo} alt="Logo" className="h-9" />
           </Link>
 
           {/* DESKTOP MENU */}
-          <ul className="hidden md:flex items-center gap-8 text-gray-800 font-medium text-lg">
+          <ul className="hidden md:flex items-center gap-8 font-medium text-gray-800">
             {navLinks.map((item) => (
               <li key={item.name} className="relative">
-
                 {item.dropdown ? (
                   <>
                     <button
-                      onClick={() => toggleDropdown(item.name)}
-                      className="flex items-center gap-1 hover:text-orange-600 transition"
+                      onClick={() =>
+                        setDesktopDropdown(
+                          desktopDropdown === item.name ? null : item.name
+                        )
+                      }
+                      className="flex items-center gap-1 hover:text-orange-600"
                     >
                       {item.name}
                       <ChevronDownIcon className="w-4 h-4" />
                     </button>
 
-                    {/* DROPDOWN (ON CLICK) */}
                     <AnimatePresence>
-                      {dropdownOpen === item.name && (
+                      {desktopDropdown === item.name && (
                         <motion.ul
-                          initial={{ opacity: 0, y: -5 }}
+                          initial={{ opacity: 0, y: -6 }}
                           animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -5 }}
-                          transition={{ duration: 0.2 }}
-                          className="absolute left-0 top-8 w-52 bg-white shadow-lg rounded-lg py-2"
+                          exit={{ opacity: 0, y: -6 }}
+                          className="absolute top-8 left-0 w-52 bg-white rounded-lg shadow-lg py-2"
                         >
-                          {item.dropdown.map((subItem) => (
-                            <li key={subItem.name}>
+                          {item.dropdown.map((sub) => (
+                            <li key={sub.name}>
                               <Link
-                                to={subItem.href}
-                                className="flex items-center justify-between px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                onClick={() => setDropdownOpen(null)}
+                                to={sub.href}
+                                onClick={() => setDesktopDropdown(null)}
+                                className="flex justify-between items-center px-4 py-2 text-sm hover:bg-gray-100"
                               >
-                                {subItem.name}
-                                <FaChevronRight className="text-xs text-gray-500" />
+                                {sub.name}
+                                <FaChevronRight className="text-xs" />
                               </Link>
                             </li>
                           ))}
@@ -85,114 +85,114 @@ export default function Navbar() {
                     </AnimatePresence>
                   </>
                 ) : (
-                  <Link to={item.href} className="hover:text-orange-600 transition">
+                  <Link to={item.href} className="hover:text-orange-600">
                     {item.name}
                   </Link>
                 )}
-
               </li>
             ))}
           </ul>
 
           {/* DESKTOP CTA */}
-          <motion.button
-            onClick={() => setDropdownOpen(null)}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="hidden md:inline-flex px-5 py-2 bg-orange-600 text-white rounded-lg shadow-md hover:bg-orange-700 transition"
+          <button
+            onClick={() => setModalOpen(true)}
+            className="hidden md:block px-5 py-2 bg-orange-600 text-white rounded-lg"
           >
             Get Free Estimate
-          </motion.button>
+          </button>
 
-          {/* MOBILE MENU BUTTON */}
-          <button onClick={() => setMobileOpen(true)} className="md:hidden block">
-            <Bars3Icon className="w-7 h-7 text-gray-900" />
+          {/* MOBILE BUTTON */}
+          <button onClick={() => setMobileOpen(true)} className="md:hidden">
+            <Bars3Icon className="w-7 h-7" />
           </button>
         </nav>
       </header>
 
-      {/* MOBILE DRAWER */}
+      {/* MOBILE OVERLAY */}
       <AnimatePresence>
         {mobileOpen && (
-          <motion.div
-            initial={{ opacity: 0, x: "100%" }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: "100%" }}
-            transition={{ type: "spring", stiffness: 120 }}
-            className="fixed top-0 right-0 h-full w-3/4 bg-white shadow-xl z-[999] md:hidden"
-          >
-            {/* Drawer Header */}
-            <div className="flex justify-between items-center px-5 py-4 border-b">
-              <img
-                src={Logo}
-                alt="Devi Varahi Global Exims"
-                className="h-8 w-auto object-contain"
-              />
-              <button onClick={() => setMobileOpen(false)}>
-                <XMarkIcon className="w-7 h-7 text-gray-800" />
-              </button>
-            </div>
+          <>
+            <motion.div
+              onClick={() => setMobileOpen(false)}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/40 z-[998]"
+            />
 
-            {/* Drawer Links */}
-            <ul className="flex flex-col gap-6 text-lg font-medium p-6">
-              {navLinks.map((item) => (
-                <li key={item.name}>
-                  {item.dropdown ? (
-                    <>
-                      <button
-                        onClick={() => toggleDropdown(item.name)}
-                        className="w-full flex justify-between items-center text-gray-900"
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              className="fixed top-0 right-0 w-3/4 h-full bg-white z-[999]"
+            >
+              <div className="flex justify-between p-5 border-b">
+                <img src={Logo} className="h-8" />
+                <button onClick={() => setMobileOpen(false)}>
+                  <XMarkIcon className="w-7 h-7" />
+                </button>
+              </div>
+
+              <ul className="p-6 space-y-5">
+                {navLinks.map((item) => (
+                  <li key={item.name}>
+                    {item.dropdown ? (
+                      <>
+                        <button
+                          onClick={() =>
+                            setMobileDropdown(
+                              mobileDropdown === item.name ? null : item.name
+                            )
+                          }
+                          className="w-full flex justify-between"
+                        >
+                          {item.name}
+                          <ChevronDownIcon className="w-5 h-5" />
+                        </button>
+
+                        {mobileDropdown === item.name && (
+                          <ul className="ml-4 mt-2 space-y-2">
+                            {item.dropdown.map((sub) => (
+                              <li key={sub.name}>
+                                <Link
+                                  to={sub.href}
+                                  onClick={() => setMobileOpen(false)}
+                                  className="text-gray-600"
+                                >
+                                  {sub.name}
+                                </Link>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </>
+                    ) : (
+                      <Link
+                        to={item.href}
+                        onClick={() => setMobileOpen(false)}
                       >
                         {item.name}
-                        <ChevronDownIcon className="w-5 h-5" />
-                      </button>
+                      </Link>
+                    )}
+                  </li>
+                ))}
+              </ul>
 
-                      {dropdownOpen === item.name && (
-                        <ul className="ml-4 mt-2 flex flex-col gap-2">
-                          {item.dropdown.map((subItem) => (
-                            <li key={subItem.name}>
-                              <Link
-                                to={subItem.href}
-                                className="text-gray-600 text-base"
-                                onClick={() => setMobileOpen(false)}
-                              >
-                                {subItem.name}
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </>
-                  ) : (
-                    <Link
-                      to={item.href}
-                      className="text-gray-900 block"
-                      onClick={() => setMobileOpen(false)}
-                    >
-                      {item.name}
-                    </Link>
-                  )}
-                </li>
-              ))}
-            </ul>
-
-            {/* CTA Button */}
-            <motion.button
-              onClick={() => {
-                setMobileOpen(false);
-                setModalOpen(true);
-              }}
-              whileHover={{ scale: 1.04 }}
-              whileTap={{ scale: 0.96 }}
-              className="block mx-6 mt-2 mb-6 px-5 py-2 bg-orange-600 text-white rounded-lg shadow-md hover:bg-orange-700 transition w-full"
-            >
-              Get Free Estimate
-            </motion.button>
-          </motion.div>
+              <button
+                onClick={() => {
+                  setMobileOpen(false);
+                  setModalOpen(true);
+                }}
+                className="mx-6 mb-6 w-[calc(100%-3rem)] py-2 bg-orange-600 text-white rounded-lg"
+              >
+                Get Free Estimate
+              </button>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
 
-      {/* ESTIMATE FORM MODAL (Web3Forms) */}
+      {/* MODAL */}
       <EstimateFormModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </>
   );
